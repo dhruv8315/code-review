@@ -1,7 +1,7 @@
 name: AI Code Review
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize]
 jobs:
   ai-review:
     runs-on: ubuntu-latest
@@ -16,4 +16,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python review_pipeline.py
+        run: python scripts/review_pipeline.py
