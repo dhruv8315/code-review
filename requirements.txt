@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+openai
+python-dotenv
+pydantic
+requests
+PyGithub
+unidiff
+faiss-cpu
+celery
+redis
+pytest
+bandit
+semgrep
+sentry-sdk
