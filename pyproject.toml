@@ -1,0 +1,21 @@
+[project]
+name = "ai-code-review"
+version = "0.1.0"
+description = "AI powered code review CLI tool"
+authors = [
+    {name="Dhruv Patel"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "typer",
+    "rich"
+]
+
+[project.scripts]
+code-review = "cli:app"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

@@ -13,3 +13,5 @@ pytest
 bandit
 semgrep
 sentry-sdk
+typer
+rich
