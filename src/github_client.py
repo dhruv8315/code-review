@@ -11,7 +11,11 @@ from github import Github, GithubException
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 
-from .models import PRContext, FileDiff, ReviewResult, ReviewEvent
+from models import PRContext, FileDiff, ReviewResult, ReviewEvent
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +63,7 @@ class GitHubClient:
         try:
             repo = self._get_repo(repo_name)
             pr = self._get_pr(repo, pr_number)
-            changed_files = list[FileDiff] = []
+            changed_files: list[FileDiff] = []
             total_additions = 0
             total_deletions = 0
 
@@ -107,6 +111,27 @@ class GitHubClient:
             raise ValueError(f"Failed to fetch PR context: {e}")
         
     
+    def get_raw_diff(self, repo_name: str, pr_number: int) -> str:
+        try:
+            import httpx
+            url = f"https://api.github.com/repos/{repo_name}/pulls/{pr_number}"
+            headers = {
+                "Authorizations": f"Bearer {self._token}",
+                "Accept": "application/vnd.github.v3.diff"
+            }
+
+            response = httpx.get(url,headers=headers,follow_redirects=True)
+            response.raise_for_status()
+            return response.text
+
+        except GithubException as e:
+            logger.error(f"GitHub API error: {e}")
+            raise ValueError(f"Failed to fetch raw diff: {e}")
+        
+    """
+    Commenting on PRs
+    """
+    def post_review(self,repo_name: str, pr_number: int, Result:ReviewResult) -> None:
     
     """
     Helper Functions
