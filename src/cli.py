@@ -113,6 +113,7 @@ def review(repo: str, pr: int, fail_on: str, no_post: bool, output: str, verbose
 
     #Load configuration
     try:
+         #Get the settings from config.py
          settings = get_settings()
     except Exception as e:
          print(f"[bold red]Error loading configuration: {e}[/bold red]")
