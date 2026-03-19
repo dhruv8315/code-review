@@ -11,7 +11,7 @@ from github import Github, GithubException
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 
-from models import PRContext, FileDiff, ReviewResult, ReviewEvent
+from models import PRContext, FileDiff, ReviewResult, ReviewIssue, ReviewEvent
 
 from dotenv import load_dotenv
 import os
@@ -62,7 +62,9 @@ class GitHubClient:
         
         try:
             repo = self._get_repo(repo_name)
-            pr = self._get_pr(repo, pr_number)
+            print(repo)
+            pr = self._get_pr(repo,pr_number)
+            print(pr)
             changed_files: list[FileDiff] = []
             total_additions = 0
             total_deletions = 0
@@ -132,7 +134,40 @@ class GitHubClient:
     Commenting on PRs
     """
     def post_review(self,repo_name: str, pr_number: int, Result:ReviewResult) -> None:
-    
+        """
+        Post structure PR review
+        """
+        repo = self._get_repo(repo_name)
+        pr = self._get_pr(repo, pr_number)
+        commit = list(pr.get_commits())[-1]
+
+        inline_comments = []
+        for issue in Result.issues:
+            comment_body = self._format_inline_comment(issue)
+            inline_comments.append({
+                "path": issue.file_path,
+                "line_number": issue.line_number,
+                "side": "RIGHT",
+                "body": comment_body
+            })
+        summary_body = self._format_summary_comment(Result)
+        event = Result.review_event.value
+        
+        try:
+            pr.create_review(
+                commit=commit,
+                body=summary_body,
+                event=event,
+                comments=inline_comments
+            )
+            logger.info(
+                "Posted review to PR #%d: %s with %d inline comments",
+                pr_number, event, len(inline_comments)
+            )
+        except GithubException as e:
+            logger.error("Failed to post review: %s", e)
+            raise
+
     """
     Helper Functions
     """
@@ -149,3 +184,72 @@ class GitHubClient:
         except GithubException as e:
             logger.error(f"GitHub API error: {e}")
             raise ValueError(f"Failed to fetch pull request: {e}")
+    
+    """
+    Formatting
+    """
+    severity_emoji: dict[str, str] = {
+    "CRITICAL": "🔴",
+    "HIGH": "🟠",
+    "MEDIUM": "🟡",
+    "LOW": "🔵",
+    "INFO": "⚪️"
+    }
+
+    verdict_emoji: dict[str, str] = {
+    "BLOCKED": "🔴 **BLOCKED** — Critical issues must be resolved before merge.",
+    "WARNINGS": "🟡 **WARNINGS** — Review findings below, consider addressing before merge.",
+    "APPROVED": "🟢 **APPROVED** — No significant issues found."
+    }
+
+    def _format_inline_comment(self, issue: ReviewIssue) -> str:
+        emoji = self.severity_emoji.get(issue.severity.value, "⚪️")
+        lines = [
+            f"{emoji} **[{issue.severity.value}] {issue.category.value}** - {issue.title}",
+            "",
+            issue.description,
+            f"**Suggestion:** {issue.suggestion}"
+        ]
+        if issue.code_block:
+            lines += [
+                "",
+                "```",
+                issue.code_block,
+                "```"
+            ]
+        return "\n".join(lines)
+    
+    def _format_summary_comment(self, result: ReviewResult) -> str:
+        s = result.summary
+        verdict_line = self.verdict_emoji.get(s.verdict, "")
+
+        lines = [
+            f"# AI Code Review Summary for PR #{result.pr_number}",
+            "",
+            verdict_line,
+            "",
+           "| Severity | Count |",
+            "|----------|-------|",
+            f"| 🔴 Critical | {s.critical_count} |",
+            f"| 🟠 High     | {s.high_count} |",
+            f"| 🟡 Medium   | {s.medium_count} |",
+            f"| 🔵 Low      | {s.low_count} |",
+            f"| ⚪ Info     | {s.info_count} |",
+            f"| **Total**   | **{s.total_issues}** |",
+            "",
+            f"Files reviewed: **{s.files_reviewed}**"
+        ]
+
+        if s.overall_comment:
+            lines += [
+                "",
+                "## Overall Comments",
+                "",
+                s.overall_comment
+            ]
+        return "\n".join(lines)
+
+
+
+github_client = GitHubClient(token=os.getenv("GITHUB_TOKEN"))
+print(github_client.get_pr_context("dhruv8315/empty-repo", 3))

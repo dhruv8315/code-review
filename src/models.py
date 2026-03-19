@@ -27,7 +27,9 @@ class ReviewEvent(str, Enum):
     APPROVE          = "APPROVE"
     REQUEST_CHANGES  = "REQUEST_CHANGES"
     COMMENT          = "COMMENT"
+
 """
+Diff classes to represent content
 
 """
 class LineChange(BaseModel):
