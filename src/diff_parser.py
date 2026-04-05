@@ -41,6 +41,9 @@ class DiffParser:
                     file_diff.hunks = self._parse_patch(raw_patch, hunk.lines)
                     logger.debug("Parsed %d hunks for %s", len(file_diff.hunks), file_diff.file_path)
                     
+    """
+    Helper Function
+    """
     def _parse_patch(self, patch: str, lines: list[LineChange]) -> list[DiffHunk]:
         """
         Parse a single file's unified diff patch into a list of DiffHunk objects.
