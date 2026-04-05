@@ -33,13 +33,15 @@ class DiffParser:
         """
         print(pr_context.changed_files) #temporary debug statement to check if changed_files is populated
         for file_diff in pr_context.changed_files:
-            raw_patch = getattr(file_diff, 'hunks.header', None)
-            print(raw_patch)#temporary debug statement to check if _raw_patch is populated
-            if raw_patch:
-                file_diff.hunks = self._parse_patch(raw_patch)
-                logger.debug("Parsed %d hunks for %s", len(file_diff.hunks), file_diff.file_path)
-    
-    def _parse_patch(self, patch: str) -> list[DiffHunk]:
+            for hunk in file_diff.hunks:
+                raw_patch = getattr(hunk, 'header', None)
+                print(raw_patch)#temporary debug statement to check if _raw_patch is populated
+                if raw_patch:
+                    print(hunk.lines) #temporary debug statement to check if hunk.lines is populated
+                    file_diff.hunks = self._parse_patch(raw_patch, hunk.lines)
+                    logger.debug("Parsed %d hunks for %s", len(file_diff.hunks), file_diff.file_path)
+                    
+    def _parse_patch(self, patch: str, lines: list[LineChange]) -> list[DiffHunk]:
         """
         Parse a single file's unified diff patch into a list of DiffHunk objects.
         """
@@ -70,11 +72,12 @@ class DiffParser:
                 continue
 
             if raw_line.startswith('+') and not raw_line.startswith('+++'):
-                current_hunk.lines.append(LineChange(
-                    line_number=new_line_num,
-                    content=raw_line[1:],
-                    type_of_change='added'
-                ))
+                current_hunk.lines.append(
+                    LineChange(
+                        line_number=new_line_num,
+                        content=raw_line[1:],
+                        type_of_change='added'
+                        ))
                 new_line_num += 1
             elif raw_line.startswith('-') and not raw_line.startswith('---'):
                 current_hunk.lines.append(LineChange(
@@ -130,8 +133,5 @@ pr_context = PRContext(
     total_deletions=1
     )
 
-raw_header = pr_context.changed_files
-print(raw_header)
 parser = DiffParser()
 print(parser.parse_pr_context(pr_context))
-

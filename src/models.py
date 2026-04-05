@@ -63,7 +63,7 @@ class PRContext(BaseModel):
     repo_name: str = Field(..., description='Repository name in the format "owner/repo".')
     pr_number: int = Field(..., description='Pull request number.')
     pr_title: str = Field(..., description='Title of the pull request.')
-    pr_description: str = Field(default='')
+    pr_description: Optional[str] = Field(default='')
     base_branch: str = Field(default='')
     head_branch: str = Field(default='')
     author: str = Field(default='')

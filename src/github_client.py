@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING
 from github import Github, GithubException
 from github.PullRequest import PullRequest
 from github.Repository import Repository
-
 from models import PRContext, FileDiff, ReviewResult, ReviewIssue, ReviewEvent
 
 from dotenv import load_dotenv
@@ -96,8 +95,8 @@ class GitHubClient:
                 total_deletions += file.deletions
             
             return PRContext(
-                repo_name=repo,
-                pr_number=pr,
+                repo_name=repo_name,
+                pr_number=pr_number,
                 pr_title=pr.title,
                 pr_description=pr.body,
                 base_branch=pr.base.ref,
