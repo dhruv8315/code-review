@@ -13,6 +13,14 @@ from pydantic import Field
 
 from models import Severity
 
+def _find_dotenv() -> Path | None:
+    """Walk up from cwd looking for a .env file."""
+    cwd = Path.cwd()
+    for directory in [cwd, *cwd.parents]:
+        candidate = directory / ".env"
+        if candidate.exists():
+            return candidate
+    return None
 
 class Settings(BaseSettings):
     """
@@ -23,7 +31,7 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_find_dotenv(),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",          # ignore unknown env vars
@@ -65,13 +73,3 @@ def get_settings() -> Settings:
     get_settings.cache_clear() in tests to reset between test cases.
     """
     return Settings()  # type: ignore[call-arg]
-
-
-def find_dotenv() -> Path | None:
-    """Walk up from cwd looking for a .env file."""
-    cwd = Path.cwd()
-    for directory in [cwd, *cwd.parents]:
-        candidate = directory / ".env"
-        if candidate.exists():
-            return candidate
-    return None
