@@ -27,11 +27,17 @@ class DiffParser:
     def __init__(self,context_lines: int = 10):
         self.context_lines = context_lines
     
-    def parse_pr_context(self, pr_context: PRContext) -> None:
+    def parse_pr_patch(self, pr_patch: str) -> list[DiffHunk]:
         """
         Parses the raw patches of every file in PRContext
         """
-        print(pr_context.changed_files) #temporary debug statement to check if changed_files is populated
+        #print(pr_patch) #temporary debug statement to check if changed_files is populated
+        
+        return self._parse_patch(pr_patch)
+        
+        """
+        Convert the raw patch string into structured DiffHunk and LineChange objects for each file in the PRContext.
+
         for file_diff in pr_context.changed_files:
             for hunk in file_diff.hunks:
                 raw_patch = getattr(hunk, 'header', None)
@@ -40,8 +46,11 @@ class DiffParser:
                     print(hunk.lines) #temporary debug statement to check if hunk.lines is populated
                     file_diff.hunks = self._parse_patch(raw_patch, hunk.lines)
                     logger.debug("Parsed %d hunks for %s", len(file_diff.hunks), file_diff.file_path)
-                    
-    def _parse_patch(self, patch: str, lines: list[LineChange]) -> list[DiffHunk]:
+        """            
+    """
+    Helper Function
+    """
+    def _parse_patch(self, patch: str) -> list[DiffHunk]:
         """
         Parse a single file's unified diff patch into a list of DiffHunk objects.
         """
@@ -94,7 +103,7 @@ class DiffParser:
                     type_of_change='context'
                 ))
                 new_line_num += 1
-        print(hunks)
+        #print(hunks)
         return hunks
     
 
@@ -133,5 +142,5 @@ pr_context = PRContext(
     total_deletions=1
     )
 
-parser = DiffParser()
-print(parser.parse_pr_context(pr_context))
+"""parser = DiffParser()
+print(parser.parse_pr_context(pr_context))"""

@@ -11,6 +11,7 @@ from github import Github, GithubException
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from models import PRContext, FileDiff, ReviewResult, ReviewIssue, ReviewEvent
+from diff_parser import DiffParser
 
 from dotenv import load_dotenv
 import os
@@ -67,6 +68,7 @@ class GitHubClient:
             changed_files: list[FileDiff] = []
             total_additions = 0
             total_deletions = 0
+            parser = DiffParser()
 
             for file in pr.get_files():
 
@@ -82,7 +84,7 @@ class GitHubClient:
                     file_path=file.filename,
                     language=detect_language(file.filename),
                     change_type=file.status,
-                    hunks=[],
+                    hunks=parser.parse_pr_patch(file.patch),
                     additions=file.additions,
                     deletions=file.deletions
                 )
