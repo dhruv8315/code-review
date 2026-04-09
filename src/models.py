@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from enum import Enum
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 """
 Enums
@@ -93,7 +95,7 @@ class ReviewSummary(BaseModel):
     low_count: int            = Field(default=0)
     info_count: int           = Field(default=0)
     files_reviewed: int       = Field(default=0)
-    verdict: str              = Field(default="APPROVED")   # BLOCKED / WARNINGS / APPROVED
+    verdict: str              = Field(default="BLOCKED")   # BLOCKED / WARNINGS / APPROVED
     overall_comment: str      = Field(default="")
 
 class ReviewResult(BaseModel):
@@ -132,9 +134,11 @@ class ReviewResult(BaseModel):
 Config model
 """
 class ReviewConfig(BaseModel):
-    github_token: str = Field(..., description="GitHub API token with repo access.")
-    anthropic_api_key: str = Field(..., description="Anthropic API key for AI model access.")
-    model: str = Field(default="claude-sonnet-4")
+    github_token: str = Field(default=os.getenv("GITHUB_TOKEN"), description="GitHub API token with repo access.")
+    #openai_api_key: str = Field(default=os.getenv("OPENAI_API_KEY"), description="OpenAI API key for AI model access.")
+    anthropic_api_key: str = Field(default=os.getenv("ANTHROPIC_API_KEY"), description="Anthropic API key for AI model access.")
+    model: str = Field(default="claude-sonnet-3.5")
+    #model: str = Field(default="gpt-4o-mini")
     max_tokens: int = Field(default=4096)
     fail_on_severity: Severity = Field(default=Severity.HIGH, description="Exit with non-zero code if issues at this severity or above are found")
     post_comments: bool = Field(default=True, description="Post inline comments to GitHub PR")
