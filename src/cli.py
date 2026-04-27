@@ -18,9 +18,9 @@ from rich.console import Console, console
 from rich.table import Table
 from rich import box
 
-from .config import get_settings
-from .reporter import Reporter
-from .models import Severity, ReviewConfig
+from config import get_settings
+from reporter import Reporter
+from models import Severity, ReviewConfig
 
 """
 Logging configuration
@@ -132,9 +132,9 @@ def review(repo: str, pr: int, fail_on: str, no_post: bool, output: str, verbose
 
 
     #Import pipeline
-    from .github_client import GitHubClient
-    from .ai_pipeline import AIPipeline
-    from .diff_parser import DiffParser
+    from github_client import GitHubClient
+    from ai_pipeline import AIPipeline
+    from diff_parser import DiffParser
 
     try:
         #Step1: Fetch PR diff
@@ -144,6 +144,7 @@ def review(repo: str, pr: int, fail_on: str, no_post: bool, output: str, verbose
         #Step2: Parse diff into structured format
         parser = DiffParser(context_lines=config.context_lines)
         parser.parse_pr_context(pr_context)
+        reporter = Reporter(verbose)
 
         #Step 3: Run AI pipeline
         pipeline = AIPipeline(config)
