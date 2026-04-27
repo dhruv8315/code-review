@@ -13,14 +13,14 @@ import logging
 from typing import Any
 import openai
 import anthropic
-from dotenv import load_dotenv
-import os
-load_dotenv()
 from models import (
     PRContext, FileDiff, DiffHunk,
     ReviewResult, ReviewIssue, ReviewSummary,
     Severity, IssueCategory, ReviewConfig, LineChange
 )
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
