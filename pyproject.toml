@@ -1,21 +1,50 @@
 [project]
-name = "ai-code-review"
+name = "ai-code-reviewer"
 version = "0.1.0"
-description = "AI powered code review CLI tool"
-authors = [
-    {name="Dhruv Patel"}
-]
+description = "AI-powered code review CLI tool with GitHub Actions integration"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["code-review", "ai", "github", "cli", "anthropic"]
 
 dependencies = [
-    "typer",
-    "rich"
+    "click>=8.1",
+    "PyGithub>=2.1",
+    "anthropic>=0.25",
+    "pydantic>=2.5",
+    "pydantic-settings>=2.1",
+    "rich>=13.7",
+    "python-dotenv>=1.0",
+    "httpx>=0.26",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "pytest-mock>=3.12",
+    "ruff>=0.3",
+    "mypy>=1.9",
 ]
 
 [project.scripts]
-code-review = "cli:app"
+code-review = "cli:main"
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
