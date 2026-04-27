@@ -25,6 +25,6 @@ jobs:
       - name: Run AI Review Pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python review_pipeline.py
