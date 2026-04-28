@@ -194,7 +194,9 @@ class Reporter:
         ))
 
         self.console.print()
-#Example usage:
+
+
+"""#Example usage:
 result = ReviewResult(
     repo_name="example/repo",
     pr_number=42,
@@ -234,3 +236,4 @@ result = ReviewResult(
 
 reporter = Reporter(verdict=True)
 reporter.print_result(result)
+"""

@@ -252,5 +252,5 @@ class GitHubClient:
 
 
 
-github_client = GitHubClient(token=os.getenv("GITHUB_TOKEN"))
-print(github_client.get_pr_context("dhruv8315/empty-repo", 3))
+"""github_client = GitHubClient(token=os.getenv("GITHUB_TOKEN"))
+print(github_client.get_pr_context("dhruv8315/empty-repo", 3))"""

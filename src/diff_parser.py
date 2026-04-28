@@ -107,7 +107,7 @@ class DiffParser:
         return hunks
     
 
-print("DiffParser module loaded successfully.")
+"""print("DiffParser module loaded successfully.")
 pr_context = PRContext(
     repo_name="example/repo",
     pr_number=123,
@@ -142,5 +142,5 @@ pr_context = PRContext(
     total_deletions=1
     )
 
-"""parser = DiffParser()
+parser = DiffParser()
 print(parser.parse_pr_context(pr_context))"""

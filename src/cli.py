@@ -14,7 +14,7 @@ import json
 import logging
 
 import click
-from rich.console import Console, console
+from rich.console import Console
 from rich.table import Table
 from rich import box
 
@@ -41,7 +41,7 @@ Main group
 @click.group()
 @click.version_option(version="0.1.0", prog_name="Code Reviewer")
 def main() -> None:
-        """
+    """
     🤖  AI Code Reviewer — context-aware PR reviews powered by Claude.
 
     Reads your pull request diff, sends it through an AI pipeline, and
@@ -193,10 +193,13 @@ def config(verbose: bool) -> None:
     _setup_logging(verbose)
     report = Reporter(verbose)
 
+    console = Console()
+
     try:
         settings = get_settings()
 
     except Exception as exc:
+        
         console.print(f"[bold red]Config error:[/bold red] {exc}")
         console.print("[dim]Set GITHUB_TOKEN and ANTHROPIC_API_KEY in your environment or .env file.[/dim]")
         sys.exit(2)
@@ -214,11 +217,6 @@ def config(verbose: bool) -> None:
     table.add_column("Value",         style="cyan")
     table.add_column("Source",        style="dim")
 
-    for name, value, source in rows:
-        table.add_row(name, value, source)
-
-    console.print(table)
-
     rows = [
         ("github_token",      mask(settings.github_token),      "env / .env"),
         ("anthropic_api_key", mask(settings.anthropic_api_key), "env / .env"),
@@ -228,6 +226,12 @@ def config(verbose: bool) -> None:
         ("post_comments",     str(settings.post_comments),      "env / default"),
         ("context_lines",     str(settings.context_lines),      "env / default"),
     ]
+    
+    for name, value, source in rows:
+        table.add_row(name, value, source)
+
+    console.print(table)
+
 
 """
 version command
@@ -237,6 +241,7 @@ def version() -> None:
     """
     Print the tool version.
     """
+    console = Console()
     console.print("[bold blue]Code Reviewer CLI v0.1.0[/bold blue]")
 
 
@@ -277,35 +282,3 @@ if __name__ == "__main__":
 
 
     main()
-
-
-"""
-import typer
-from typing import Annotated
-from rich import print
-from review_pipeline import review_pipeline
-
-app = typer.Typer()
-
-#Additional command to see the list of commands
-@app.command()
-def version():
-    print("AI Code Review CLI v1.0")
-
-@app.command()
-def review_pr(
-    repo: Annotated[str, typer.Option(help="GitHub repository name in the format 'owner/repo'")],
-    pr: Annotated[int, typer.Option(help="Pull request number to review")]
-    ):
-
-    #Run AI code review on a pull request.
-  
-    print(f"[bold blue]Starting AI code review for PR #{pr} in repository '{repo}'...[/bold blue]")
-    
-    review_pipeline(repo, pr)
-
-    print("[bold green]Review completed[/bold green]")
-
-if __name__ == "__main__":
-    app()
-"""

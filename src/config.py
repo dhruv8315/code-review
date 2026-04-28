@@ -39,7 +39,7 @@ class Settings(BaseSettings):
 
     # Required
     github_token: str           = Field(..., description="GitHub personal access token")
-    #anthropic_api_key: str      = Field(..., description="Anthropic API key")
+    anthropic_api_key: str      = Field(..., description="Anthropic API key")
 
     # AI model settings
     model: str                  = Field(
